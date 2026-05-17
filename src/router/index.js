@@ -5,6 +5,7 @@ import LoginPage from '../components/pages/LoginPage/LoginPage.vue';
 import RegisterPage from '../components/pages/RegisterPage/RegisterPage.vue';
 import DashboardPage from '../components/pages/DashboardPage/DashBoardPage.vue';
 import AccountsPage from '../components/pages/AccountsPage/AccountsPage.vue';
+import UsersPage from '../components/pages/UsersPage/UsersPage.vue';
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -12,6 +13,7 @@ const routes = [
     { path: '/register', component: RegisterPage, meta: { public: true } },
     { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
     { path: '/accounts', component: AccountsPage, meta: { requiresAuth: true } },
+    { path: '/users', component: UsersPage, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
