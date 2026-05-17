@@ -1,0 +1,41 @@
+import { defineStore } from 'pinia';
+import { authService } from '../services/authService.js';
+
+export const useAuthStore = defineStore('auth', {
+    state: () => ({
+        token: localStorage.getItem('token') || null,
+        role: localStorage.getItem('role') || null,
+        email: localStorage.getItem('email') || null,
+    }),
+
+    getters: {
+        isLoggedIn: (state) => !!state.token,
+        isEmployee: (state) => state.role === 'EMPLOYEE',
+        isCustomer: (state) => state.role === 'CUSTOMER',
+    },
+
+    actions: {
+        async login(email, password) {
+            const data = await authService.login(email, password);
+            this.token = data.token;
+            this.role = data.role;
+            this.email = data.email;
+            localStorage.setItem('email', data.email);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('role', data.role);
+        },
+
+        async register(userData) {
+            return await authService.register(userData);
+        },
+
+        logout() {
+            this.token = null;
+            this.role = null;
+            this.userId = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('userId');
+        },
+    },
+});
