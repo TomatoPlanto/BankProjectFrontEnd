@@ -1,116 +1,97 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <h1 class="text-2xl font-bold text-center mb-6">Banking App</h1>
-      <h2 class="text-xl text-center mb-6 text-gray-600">Register</h2>
+  <div class="auth-page">
+    <div class="auth-card auth-card-wide">
 
-      <div v-if="error" class="bg-red-100 text-red-700 p-3 rounded mb-4">
-        {{ error }}
+      <div class="auth-logo">
+        <span class="auth-logo-name">InhoBank</span>
+        <span class="auth-logo-sub">Open an account</span>
       </div>
 
-      <div v-if="success" class="bg-green-100 text-green-700 p-3 rounded mb-4">
-        Registration successful! Wait for employee approval before logging in.
+      <div v-if="error"   class="alert alert-error">⚠ {{ error }}</div>
+      <div v-if="success" class="alert alert-success">
+        ✓ Registration submitted. An employee will review and approve your account.
       </div>
 
-      <form @submit.prevent="handleRegister">
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">Email</label>
-          <input v-model="form.email" type="email"
-                 class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                 placeholder="Enter your email" required />
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">Password</label>
-          <input v-model="form.password" type="password"
-                 class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                 placeholder="Enter your password" required />
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-gray-700 mb-2">First Name</label>
-            <input v-model="form.firstName"
-                   class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                   placeholder="First name" required />
+      <form v-if="!success" @submit.prevent="handleRegister">
+        <div class="field-row">
+          <div class="field">
+            <label class="label">First name</label>
+            <input v-model="form.firstName" class="input" placeholder="John" required />
           </div>
-          <div>
-            <label class="block text-gray-700 mb-2">Last Name</label>
-            <input v-model="form.lastName"
-                   class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                   placeholder="Last name" required />
+          <div class="field">
+            <label class="label">Last name</label>
+            <input v-model="form.lastName" class="input" placeholder="Doe" required />
           </div>
         </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">Infix (optional)</label>
-          <input v-model="form.infix"
-                 class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                 placeholder="van, de, etc." />
+        <div class="field">
+          <label class="label">Infix <span style="opacity:0.5;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <input v-model="form.infix" class="input" placeholder="van, de, etc." />
         </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700 mb-2">BSN</label>
-          <input v-model="form.bsn"
-                 class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                 placeholder="9 digit BSN number" required maxlength="9" />
+        <div class="field">
+          <label class="label">Email address</label>
+          <input v-model="form.email" type="email" class="input"
+            placeholder="you@example.com" required autocomplete="email" />
         </div>
 
-        <div class="mb-6">
-          <label class="block text-gray-700 mb-2">Phone Number</label>
-          <input v-model="form.phoneNumber"
-                 class="w-full border rounded p-2 focus:outline-none focus:border-blue-500"
-                 placeholder="Phone number" required />
+        <div class="field">
+          <label class="label">Password</label>
+          <input v-model="form.password" type="password" class="input"
+            placeholder="Min. 8 characters" required autocomplete="new-password" />
         </div>
 
-        <button type="submit" :disabled="loading"
-                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50">
-          {{ loading ? 'Registering...' : 'Register' }}
+        <div class="field-row">
+          <div class="field">
+            <label class="label">BSN</label>
+            <input v-model="form.bsn" class="input" placeholder="9 digits"
+              required maxlength="9" pattern="\d{9}" />
+          </div>
+          <div class="field">
+            <label class="label">Phone</label>
+            <input v-model="form.phoneNumber" class="input" placeholder="06xxxxxxxx" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold" style="width:100%; margin-top:0.5rem" :disabled="loading">
+          <span v-if="loading" class="spinner"></span>
+          {{ loading ? 'Submitting…' : 'Create account' }}
         </button>
       </form>
 
-      <p class="text-center mt-4 text-gray-600">
-        Already have an account?
-        <RouterLink to="/login" class="text-blue-600 hover:underline">Login</RouterLink>
+      <p class="auth-divider">
+        Already have an account? <RouterLink to="/login">Sign in</RouterLink>
       </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useAuthStore } from '../../../stores/authStore.js';
+import { ref } from 'vue'
+import { useAuthStore } from '../../../stores/authStore.js'
 
-const authStore = useAuthStore();
-const error = ref('');
-const success = ref(false);
-const loading = ref(false);
+const authStore = useAuthStore()
+const error   = ref('')
+const success = ref(false)
+const loading = ref(false)
 
 const form = ref({
-  email: '',
-  password: '',
-  firstName: '',
-  infix: '',
-  lastName: '',
-  bsn: '',
-  phoneNumber: '',
-});
+  email: '', password: '', firstName: '',
+  infix: '', lastName: '', bsn: '', phoneNumber: '',
+})
 
 async function handleRegister() {
-  error.value = '';
-  success.value = false;
-  loading.value = true;
+  error.value   = ''
+  success.value = false
+  loading.value = true
   try {
-    await authStore.register(form.value);
-    success.value = true;
-    form.value = {
-      email: '', password: '', firstName: '',
-      infix: '', lastName: '', bsn: '', phoneNumber: ''
-    };
+    await authStore.register(form.value)
+    success.value = true
+    form.value = { email:'', password:'', firstName:'', infix:'', lastName:'', bsn:'', phoneNumber:'' }
   } catch (e) {
-    error.value = e.message;
+    error.value = e.message || 'Registration failed'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

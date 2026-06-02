@@ -1,1 +1,321 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:         #0b0f1a;
+  --surface:    #111827;
+  --border:     rgba(255,255,255,0.07);
+  --text:       #e2e8f0;
+  --muted:      #64748b;
+  --accent:     #c9a84c;
+  --accent-dim: rgba(201,168,76,0.12);
+  --blue:       #3b82f6;
+  --green:      #22c55e;
+  --red:        #ef4444;
+  --radius:     14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input::placeholder { color: var(--muted); }
+.input:focus {
+  border-color: rgba(201,168,76,0.4);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+}
+
+.label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-gold {
+  background: linear-gradient(135deg, #c9a84c, #a8862f);
+  color: #0b0f1a;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+}
+.btn-gold:hover:not(:disabled) {
+  box-shadow: 0 6px 24px rgba(201,168,76,0.4);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+
+.btn-danger {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(239,68,68,0.2); }
+
+.spinner {
+  width: 15px; height: 15px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: #0b0f1a;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+.alert-error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.2);  color: #fca5a5; }
+.alert-success { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.2);  color: #86efac; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.badge-green  { background: rgba(34,197,94,0.12);  color: #86efac; }
+.badge-red    { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+.badge-blue   { background: rgba(59,130,246,0.12); color: #93c5fd; }
+.badge-purple { background: rgba(168,85,247,0.12); color: #d8b4fe; }
+.badge-gold   { background: rgba(201,168,76,0.12); color: #c9a84c; }
+
+.navbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.navbar-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.navbar-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.15s;
+}
+.nav-link:hover { color: var(--text); }
+
+.page { min-height: 100vh; background: var(--bg); }
+.page-content { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 1.75rem;
+}
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 1px solid var(--border); }
+th {
+  text-align: left;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+td { padding: 0.875rem 1.25rem; font-size: 0.875rem; color: var(--text); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  width: 100%;
+  max-width: 440px;
+  animation: slideUp 0.25s ease;
+}
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.auth-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.auth-page::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 75% 15%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(59,130,246,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.auth-card-wide { max-width: 480px; }
+.auth-logo { text-align: center; margin-bottom: 2rem; }
+.auth-logo-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  display: block;
+}
+.auth-logo-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 0.2rem;
+}
+.auth-divider {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.auth-divider a { color: var(--accent); text-decoration: none; }
+.auth-divider a:hover { text-decoration: underline; }
+
+.field { margin-bottom: 1.1rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.pin-input {
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.25rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 0.35rem 0;
+}
+.stat-sub { font-size: 0.8rem; color: var(--muted); }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
