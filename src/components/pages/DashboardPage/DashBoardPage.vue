@@ -1,12 +1,44 @@
 <template>
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="crest"><span>IB</span></div>
+        <div class="brand-text">
+          <div class="brand-name">InhoBank</div>
+          <div class="brand-sub">Est. 1888 · Private</div>
+        </div>
+=======
+>>>>>>> Stashed changes
   <div class="page">
     <nav class="navbar">
       <span class="navbar-brand">InhoBank</span>
       <div class="navbar-links">
+<<<<<<< Updated upstream
+=======
         <template v-if="authStore.isEmployee">
           <RouterLink to="/dashboard"  class="nav-link"><b><i>Dashboard</i></b></RouterLink>
           <RouterLink to="/accounts" class="nav-link">Accounts</RouterLink>
           <RouterLink to="/users"  class="nav-link">Users</RouterLink>
+        </template>
+        <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
+        <button class="btn btn-ghost" style="padding:0.4rem 1rem" @click="openDetails()">User details</button>
+        <button class="btn btn-danger" style="padding:0.4rem 1rem" @click="handleLogout">Sign out</button>
+>>>>>>> origin/CSS
+      </div>
+
+      <nav class="nav">
+        <div class="nav-label">Banking</div>
+        <RouterLink to="/dashboard" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>
+          Overview
+        </RouterLink>
+>>>>>>> Stashed changes
+        <template v-if="authStore.isEmployee">
+          <RouterLink to="/accounts" class="nav-link">Accounts</RouterLink>
+          <RouterLink to="/users"    class="nav-link">Users</RouterLink>
         </template>
         <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
         <button class="btn btn-ghost" style="padding:0.4rem 1rem" @click="openDetails()">User details</button>
@@ -47,6 +79,13 @@
             </div>
           </div>
         </div>
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+      </template>
+    </main>
+=======
+>>>>>>> Stashed changes
       </div>
 
       <div v-if="authStore.isEmployee && !loading" class="card" style="padding:1.5rem">
@@ -59,6 +98,8 @@
         </div>
       </div>
     </div>
+<<<<<<< Updated upstream
+=======
 
     <div v-if="selectedUser" class="modal-overlay" @click.self="selectedUser = null">
       <div class="modal">
@@ -70,6 +111,8 @@
         <input v-model="selectedUser.phoneNumber" disabled />
       </div>
     </div>
+>>>>>>> origin/CSS
+>>>>>>> Stashed changes
   </div>
 </template>
 

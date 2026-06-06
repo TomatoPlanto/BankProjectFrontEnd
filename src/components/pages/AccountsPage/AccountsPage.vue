@@ -1,4 +1,17 @@
 <template>
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="crest"><span>IB</span></div>
+        <div class="brand-text">
+          <div class="brand-name">InhoBank</div>
+          <div class="brand-sub">Est. 1888 · Private</div>
+        </div>
+=======
+>>>>>>> Stashed changes
   <div class="page">
     <nav class="navbar">
       <span class="navbar-brand">InhoBank</span>
@@ -8,6 +21,14 @@
         <RouterLink to="/users"  class="nav-link">Users</RouterLink>
         <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
         <button class="btn btn-danger" style="padding:0.4rem 1rem" @click="handleLogout">Sign out</button>
+=======
+        <RouterLink to="/dashboard"  class="nav-link">Dashboard</RouterLink>
+        <RouterLink to="/accounts" class="nav-link"><b><i>Accounts</i></b></RouterLink>
+        <RouterLink to="/users"  class="nav-link">Users</RouterLink>
+        <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
+        <button class="btn btn-danger" style="padding:0.4rem 1rem" @click="handleLogout">Sign out</button>
+>>>>>>> origin/CSS
+>>>>>>> Stashed changes
       </div>
     </nav>
 
