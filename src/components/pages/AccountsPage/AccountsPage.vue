@@ -3,8 +3,10 @@
     <nav class="navbar">
       <span class="navbar-brand">InhoBank</span>
       <div class="navbar-links">
-        <RouterLink to="/dashboard" class="nav-link">Dashboard</RouterLink>
-        <RouterLink to="/users"     class="nav-link">Users</RouterLink>
+        <RouterLink to="/dashboard"  class="nav-link">Dashboard</RouterLink>
+        <RouterLink to="/accounts" class="nav-link"><b><i>Accounts</i></b></RouterLink>
+        <RouterLink to="/users"  class="nav-link">Users</RouterLink>
+        <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
         <button class="btn btn-danger" style="padding:0.4rem 1rem" @click="handleLogout">Sign out</button>
       </div>
     </nav>

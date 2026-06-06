@@ -4,10 +4,12 @@
       <span class="navbar-brand">InhoBank</span>
       <div class="navbar-links">
         <template v-if="authStore.isEmployee">
+          <RouterLink to="/dashboard"  class="nav-link"><b><i>Dashboard</i></b></RouterLink>
           <RouterLink to="/accounts" class="nav-link">Accounts</RouterLink>
-          <RouterLink to="/users"    class="nav-link">Users</RouterLink>
+          <RouterLink to="/users"  class="nav-link">Users</RouterLink>
         </template>
         <span style="font-size:0.8rem; color:var(--muted)">{{ authStore.email }}</span>
+        <button class="btn btn-ghost" style="padding:0.4rem 1rem" @click="openDetails()">User details</button>
         <button class="btn btn-danger" style="padding:0.4rem 1rem" @click="handleLogout">Sign out</button>
       </div>
     </nav>
@@ -57,6 +59,17 @@
         </div>
       </div>
     </div>
+
+    <div v-if="selectedUser" class="modal-overlay" @click.self="selectedUser = null">
+      <div class="modal">
+        <input v-model="selectedUser.firstName" disabled />
+        <input v-model="selectedUser.lastName" disabled />
+        <input v-model="selectedUser.infix" disabled />
+        <input v-model="selectedUser.email" disabled />
+        <input v-model="selectedUser.bsn" disabled />
+        <input v-model="selectedUser.phoneNumber" disabled />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -78,7 +91,7 @@ const firstName = computed(() => {
   if (!authStore.email) return ''
   return authStore.email.split('@')[0]
 })
-
+  
 onMounted(async () => {
   try {
     if (authStore.isCustomer) {
@@ -93,6 +106,19 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const selectedUser = ref(null)
+
+function openDetails() {
+  selectedUser.value = {
+    firstName: authStore.firstName.value,
+    lastName: authStore.lastName.value,
+    infix: authStore.infix.value,
+    email: authStore.email.value,
+    bsn: authStore.bsn.value,
+    phoneNumber: authStore.phoneNumber.value,
+  }
+}
 
 function handleLogout() {
   authStore.logout()
