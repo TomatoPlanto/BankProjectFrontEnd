@@ -16,8 +16,8 @@ const routes = [
   { path: '/atm',       component: AtmPage,       meta: { requiresAuth: true } },
   { path: '/register',  component: RegisterPage,  meta: { public: true } },
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
-  { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true } },
-  { path: '/users',     component: UsersPage,     meta: { requiresAuth: true } },
+  { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true, employeeOnly: true } },
+  { path: '/users',     component: UsersPage,     meta: { requiresAuth: true, employeeOnly: true } },
 ]
 
 const router = createRouter({
@@ -29,6 +29,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   if (to.meta.requiresAuth && !authStore.isLoggedIn) return next('/login')
   if (to.meta.public && authStore.isLoggedIn) return next('/dashboard')
+  if (to.meta.employeeOnly && !authStore.isEmployee) return next('/dashboard')
   next()
 })
 
