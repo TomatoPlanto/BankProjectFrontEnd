@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/authStore.js'
 
 import LoginPage     from '../components/pages/LoginPage/LoginPage.vue'
 import AtmLoginPage  from '../components/pages/AtmLoginPage/AtmLoginPage.vue'
+import AtmPage       from '../components/pages/AtmPage/AtmPage.vue'
 import RegisterPage  from '../components/pages/RegisterPage/RegisterPage.vue'
 import DashboardPage from '../components/pages/DashboardPage/DashBoardPage.vue'
 import AccountsPage  from '../components/pages/AccountsPage/AccountsPage.vue'
@@ -12,6 +13,7 @@ const routes = [
   { path: '/',          redirect: '/login' },
   { path: '/login',     component: LoginPage,     meta: { public: true } },
   { path: '/atm-login', component: AtmLoginPage,  meta: { public: true } },
+  { path: '/atm',       component: AtmPage,       meta: { requiresAuth: true } },
   { path: '/register',  component: RegisterPage,  meta: { public: true } },
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
   { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true } },

@@ -75,7 +75,7 @@ async function handleAtmLogin() {
     localStorage.setItem('role',  data.role)
     localStorage.setItem('email', data.email)
 
-    router.push('/dashboard')
+    router.push('/atm')
   } catch (e) {
     error.value = e.message || 'Invalid IBAN or PIN'
   } finally {
