@@ -17,6 +17,7 @@ const dirname =
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   // plugins: [vue(), vueDevTools()],
+  base: "/BankProjectFrontEnd/",
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
