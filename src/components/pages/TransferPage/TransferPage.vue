@@ -1,7 +1,12 @@
 <template>
-    <div>{{error}}</div>
+    <div v-if="error" class="alert alert-error">⚠ {{ error }}</div>
+
+    <div v-if="success" class="alert alert-success">
+    ✓ Transaction were successful.
+    </div>
+
     <div class="app">
-        <form>
+        <form v-if="!success" @submit.prevent="handleSubmit">
             <div class="field-row">
                 <div class="field">
                     <label class="label">From iban</label>
@@ -33,31 +38,33 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue';
-    import { useRoute } from 'vue-router';
+    import { ref } from 'vue';
     import { useAuthStore } from '../../../stores/authStore.js';
     import { accountService } from '../../../services/accountService.js';
-    import { transactionService } from '../../../services/transactionService.js'; // <div>{{ $route.params.accountId }}</div>
+    import { transactionService } from '../../../services/transactionService.js';
 
-    const route = useRoute();
     const authStore = useAuthStore();
 
-    const form = {fromIban: '', toIban: '', amount: 0, description: ""};
+    const form = ref({ fromIban: '', toIban: '', amount: 0, description: "" });
 
-    const error = ref('');
+    const error   = ref('');
     const loading = ref(false);
     const success = ref(false);
 
-    async function handleRegister() {
+    async function handleSubmit() {
         error.value   = '';
         success.value = false;
         loading.value = true;
 
         try {
-            //let fromAcc = await accountService.
+            let fromAcc = await accountService.getAccountByIban(authStore.token, form.value.fromIban);
+            let toAcc   = await accountService.getAccountByIban(authStore.token, form.value.toIban);
+
+            await transactionService.createTransaction(authStore.token, {fromAccountId: fromAcc.accountId, toAccountId: toAcc.accountId, transferAmount: form.value.amount, description: form.value.description});
 
             success.value = true;
-            form.value = { email:'', password:'', firstName:'', infix:'', lastName:'', bsn:'', phoneNumber:'' };
+
+            form.value = { fromIban: '', toIban: '', amount: 0, description: "" };
         } catch (e) {
             error.value = e.message || 'Transaction failed';
         } finally {
