@@ -55,7 +55,7 @@ async function handleAtmLogin() {
   try {
     const response = await post('/api/atm/login', {
       iban: iban.value,
-      pin: parseInt(pin.value),
+      pin: pin.value,
     })
     if (!response.ok) {
       const data = await response.json()
@@ -68,7 +68,7 @@ async function handleAtmLogin() {
     localStorage.setItem('token', data.token)
     localStorage.setItem('role',  data.role)
     localStorage.setItem('email', data.email)
-    router.push('/dashboard')
+    router.push('/atm')
   } catch (e) {
     error.value = e.message || 'Invalid IBAN or PIN'
   } finally {
