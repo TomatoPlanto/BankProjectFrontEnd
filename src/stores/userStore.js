@@ -23,6 +23,19 @@ export const useUserStore = defineStore('user', {
             }
         },
 
+        async searchByName(name) {
+            const authStore = useAuthStore();
+            this.loading = true;
+            this.error = '';
+            try {
+                this.users = await userService.searchByName(authStore.token, name);
+            } catch (e) {
+                this.error = e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async approveUser(userId) {
             const authStore = useAuthStore();
             this.error = '';
