@@ -1,7 +1,6 @@
 import { get, put } from '../utils/api.js'
 
 export const userService = {
-  // Returns the logged-in user's own profile
   async getMe(token) {
     const response = await get('/api/users/me', {
       headers: { Authorization: `Bearer ${token}` },
@@ -15,6 +14,14 @@ export const userService = {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!response.ok) throw new Error('Failed to fetch users')
+    return response.json()
+  },
+
+  async searchByName(token, name) {
+    const response = await get(`/api/users/search?name=${encodeURIComponent(name)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) throw new Error('Search failed')
     return response.json()
   },
 
