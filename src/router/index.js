@@ -14,11 +14,11 @@ const routes = [
   { path: '/',          redirect: '/login' },
   { path: '/login',     component: LoginPage,     meta: { public: true } },
   { path: '/atm-login', component: AtmLoginPage,  meta: { public: true } },
-    { path: '/atm',       component: AtmPage,       meta: { requiresAuth: true } },
+  { path: '/atm',       component: AtmPage,       meta: { requiresAuth: true } },
   { path: '/register',  component: RegisterPage,  meta: { public: true } },
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
   { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true, employeeOnly: true } },
-    { path: '/account/:accountId', name: 'account',   component: ViewAccountPage,  meta: { requiresAuth: true, employeeOnly: false } },
+  { path: '/account/:accountId', name: 'account',   component: ViewAccountPage,  meta: { requiresAuth: true, employeeOnly: false } },
   { path: '/users',     component: UsersPage,     meta: { requiresAuth: true, employeeOnly: true } },
 ]
 
