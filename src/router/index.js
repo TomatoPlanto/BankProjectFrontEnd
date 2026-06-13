@@ -8,7 +8,8 @@ import RegisterPage  from '../components/pages/RegisterPage/RegisterPage.vue'
 import DashboardPage from '../components/pages/DashboardPage/DashBoardPage.vue'
 import AccountsPage  from '../components/pages/AccountsPage/AccountsPage.vue'
 import ViewAccountPage from '../components/pages/ViewAccountPage/ViewAccountPage.vue'
-import UsersPage     from '../components/pages/UsersPage/UsersPage.vue'
+import TransferPage    from '../components/pages/TransferPage/TransferPage.vue'
+import UsersPage       from '../components/pages/UsersPage/UsersPage.vue'
 
 const routes = [
   { path: '/',          redirect: '/login' },
@@ -19,7 +20,8 @@ const routes = [
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
   { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true, employeeOnly: true } },
   { path: '/account/:accountId', name: 'account',   component: ViewAccountPage,  meta: { requiresAuth: true, employeeOnly: false } },
-  { path: '/users',     component: UsersPage,     meta: { requiresAuth: true, employeeOnly: true } },
+  { path: '/transfer',           name: 'transfer',  component: TransferPage,     meta: { requiresAuth: true, employeeOnly: false } },
+  { path: '/users',     component: UsersPage,        meta: { requiresAuth: true, employeeOnly: true } },
 ]
 
 const router = createRouter({
@@ -30,9 +32,11 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   const authStore = useAuthStore()
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) return '/login'
   if (to.meta.public && authStore.isLoggedIn) return '/dashboard'
   if (to.meta.employeeOnly && !authStore.isEmployee) return '/dashboard'
+  
   return true;
 })
 

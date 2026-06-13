@@ -17,6 +17,14 @@ export const accountService = {
         return response.json();
     },
 
+    async getAccountByIban(token, iban) {
+        const response = await get(`/api/accounts/iban/${encodeURIComponent(iban)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error('IBAN not found');
+        return response.json();
+    },
+
     async getAccountsByUserId(token, userId) {
         const response = await get(`/api/accounts/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },

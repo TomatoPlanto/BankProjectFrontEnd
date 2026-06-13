@@ -215,12 +215,12 @@
                   </div>
                   <span>Statements</span>
                 </div>
-                <div class="action">
+                <RouterLink to="/transfer" class="action">
                   <div class="action-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                   <span>Transfer</span>
-                </div>
+                </RouterLink>       
               </div>
             </section>
 

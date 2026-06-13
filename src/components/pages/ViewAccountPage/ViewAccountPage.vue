@@ -121,8 +121,8 @@
             error.value = e.message;
         }
 
-        console.log(error.value);
+        //console.log(error.value);
 
-        console.log(transactionsPage.value.content[0].transactionId);
+        //console.log(transactionsPage.value.content[0].transactionId);
     })
 </script>

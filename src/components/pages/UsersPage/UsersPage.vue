@@ -50,6 +50,17 @@
         </div>
       </header>
 
+      <div style="margin-bottom: 1rem; display: flex; gap: 0.75rem;">
+        <input
+          v-model="searchQuery"
+          class="input"
+          placeholder="Search by name..."
+          style="max-width: 300px;"
+          @input="handleSearch"
+        />
+        <button v-if="searchQuery" class="btn btn-ghost" @click="clearSearch">Clear</button>
+      </div>
+
       <div class="filter-tabs">
         <button v-for="tab in ['ALL','PENDING','ACTIVE','CLOSED']" :key="tab"
           class="btn" :class="filter === tab ? 'btn-gold' : 'btn-ghost'"
@@ -112,10 +123,24 @@ const router    = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const filter    = ref('ALL')
+const searchQuery = ref('')
 
 const filteredUsers = computed(() =>
   filter.value === 'ALL' ? userStore.users : userStore.users.filter(u => u.status === filter.value)
 )
+
+function handleSearch() {
+  if (searchQuery.value.trim().length < 2) {
+    userStore.fetchAllUsers()
+    return
+  }
+  userStore.searchByName(searchQuery.value.trim())
+}
+
+function clearSearch() {
+  searchQuery.value = ''
+  userStore.fetchAllUsers()
+}
 
 function fullName(user) { return [user.firstName, user.infix, user.lastName].filter(Boolean).join(' ') }
 function statusBadge(s) { return { ACTIVE:'badge badge-green', PENDING:'badge badge-gold', CLOSED:'badge badge-red' }[s] ?? 'badge' }

@@ -1,0 +1,74 @@
+<template>
+    <div v-if="error" class="alert alert-error">⚠ {{ error }}</div>
+
+    <div v-if="success" class="alert alert-success">
+    ✓ Transaction were successful.
+    </div>
+
+    <div class="app">
+        <form v-if="!success" @submit.prevent="handleSubmit">
+            <div class="field-row">
+                <div class="field">
+                    <label class="label">From iban</label>
+                    <input v-model="form.fromIban" class="input" required />
+                </div>
+                <div class="field">
+                    <label class="label">To iban</label>
+                    <input v-model="form.toIban" class="input" required />
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label class="label">Amount</label>
+                    <input type="number" min="0.01" step="0.01" max="10000" v-model="form.amount" class="input" required />
+                </div>
+                <div class="field">
+                    <label class="label">Description</label>
+                    <input v-model="form.description" class="input" required />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width:100%; margin-top:0.5rem" :disabled="loading">
+                <span v-if="loading" class="spinner"></span>
+                {{ loading ? 'Making Transaction…' : 'Make a transfer' }}
+            </button>
+        </form>
+    </div>
+</template>
+
+<script setup>
+    import { ref } from 'vue';
+    import { useAuthStore } from '../../../stores/authStore.js';
+    import { accountService } from '../../../services/accountService.js';
+    import { transactionService } from '../../../services/transactionService.js';
+
+    const authStore = useAuthStore();
+
+    const form = ref({ fromIban: '', toIban: '', amount: 0, description: "" });
+
+    const error   = ref('');
+    const loading = ref(false);
+    const success = ref(false);
+
+    async function handleSubmit() {
+        error.value   = '';
+        success.value = false;
+        loading.value = true;
+
+        try {
+            let fromAcc = await accountService.getAccountByIban(authStore.token, form.value.fromIban);
+            let toAcc   = await accountService.getAccountByIban(authStore.token, form.value.toIban);
+
+            await transactionService.createTransaction(authStore.token, {fromAccountId: fromAcc.accountId, toAccountId: toAcc.accountId, transferAmount: form.value.amount, description: form.value.description});
+
+            success.value = true;
+
+            form.value = { fromIban: '', toIban: '', amount: 0, description: "" };
+        } catch (e) {
+            error.value = e.message || 'Transaction failed';
+        } finally {
+            loading.value = false;
+        }
+    }
+</script>
