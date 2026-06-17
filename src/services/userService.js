@@ -9,8 +9,9 @@ export const userService = {
     return response.json()
   },
 
-  async getAllUsers(token) {
-    const response = await get('/api/users', {
+  // backend returns a page object, use .content for the array
+  async getAllUsers(token, page = 0, size = 20) {
+    const response = await get(`/api/users?page=${page}&size=${size}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!response.ok) throw new Error('Failed to fetch users')

@@ -98,7 +98,7 @@ onMounted(async () => {
       const me = await userService.getMe(authStore.token)
       accounts.value = await accountService.getAccountsByUserId(authStore.token, me.userId)
     } else if (authStore.isEmployee) {
-      accounts.value = await accountService.getAllAccounts(authStore.token)
+      accounts.value = (await accountService.getAllAccounts(authStore.token)).content
     }
   } catch (e) {
     error.value = e.message

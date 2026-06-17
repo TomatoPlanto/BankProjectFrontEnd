@@ -342,7 +342,7 @@ onMounted(async () => {
     if (authStore.isCustomer) {
       accounts.value = await accountService.getAccountsByUserId(authStore.token, currentUser.value.userId)
     } else {
-      accounts.value = await accountService.getAllAccounts(authStore.token)
+      accounts.value = (await accountService.getAllAccounts(authStore.token)).content
     }
   } catch (e) {
     error.value = e.message
