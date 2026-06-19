@@ -15,7 +15,8 @@ export const useUserStore = defineStore('user', {
             this.loading = true;
             this.error = '';
             try {
-                this.users = await userService.getAllUsers(authStore.token);
+                const page = await userService.getAllUsers(authStore.token);
+                this.users = page.content;
             } catch (e) {
                 this.error = e.message;
             } finally {
