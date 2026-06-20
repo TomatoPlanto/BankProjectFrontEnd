@@ -26,6 +26,15 @@ export const accountService = {
         return response.json();
     },
 
+    // search recipients by name -> [{ accountId, iban, ownerName }]
+    async searchByOwnerName(token, name) {
+        const response = await get(`/api/accounts/search?name=${encodeURIComponent(name)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error('Search failed');
+        return response.json();
+    },
+
     async getAccountsByUserId(token, userId) {
         const response = await get(`/api/accounts/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
