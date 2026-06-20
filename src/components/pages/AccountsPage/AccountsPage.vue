@@ -58,6 +58,7 @@
         <table>
           <thead>
             <tr>
+              <th>Customer</th>
               <th>IBAN</th>
               <th>Type</th>
               <th>Balance</th>
@@ -69,6 +70,7 @@
           </thead>
           <tbody>
             <tr v-for="account in accountStore.accounts" :key="account.accountId">
+              <td style="font-weight:600">{{ account.ownerName }}</td>
               <td style="font-family:monospace; font-size:12px">{{ account.iban }}</td>
               <td>
                 <span :class="account.accountType === 'CHECKING' ? 'badge badge-blue' : 'badge badge-purple'">
@@ -91,7 +93,7 @@
               </td>
             </tr>
             <tr v-if="!accountStore.accounts.length && !accountStore.loading">
-              <td colspan="7" class="empty-state">No accounts found</td>
+              <td colspan="8" class="empty-state">No accounts found</td>
             </tr>
           </tbody>
         </table>

@@ -256,6 +256,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/authStore.js'
 import { accountService } from '../../../services/accountService.js'
 import { userService } from '../../../services/userService.js'
+import { transactionService } from '../../../services/transactionService.js'
 
 const router      = useRouter()
 const authStore   = useAuthStore()
@@ -264,8 +265,8 @@ const currentUser = ref(null)
 const loading     = ref(true)
 const error       = ref('')
 
-// Realistic 12-month activity volumes for the graph
-const volumes = [210, 295, 500, 247, 414, 350, 520, 349, 260, 535, 175, 535]
+// monthly activity totals for the graph, filled from real transactions on load
+const volumes = ref(new Array(12).fill(0))
 
 const firstName = computed(() => {
   if (currentUser.value?.firstName) return currentUser.value.firstName
@@ -304,9 +305,10 @@ const totalWhole     = computed(() => Math.floor(totalBalance.value).toLocaleStr
 const totalCents     = computed(() => (totalBalance.value % 1).toFixed(2).slice(2))
 
 const chartPts = computed(() => {
-  const max = Math.max(...volumes), min = Math.min(...volumes), range = max - min || 1
-  return volumes.map((v, i) => ({
-    x: (i / (volumes.length - 1)) * 560,
+  const vals = volumes.value
+  const max = Math.max(...vals), min = Math.min(...vals), range = max - min || 1
+  return vals.map((v, i) => ({
+    x: (i / (vals.length - 1)) * 560,
     y: 10 + (1 - (v - min) / range) * 120,
   }))
 })
@@ -336,6 +338,28 @@ const monthLabels = computed(() => {
   return labels
 })
 
+// sum each account's transactions into 12 monthly buckets (oldest -> current month)
+async function loadChart() {
+  const buckets = new Array(12).fill(0)
+  const now = new Date()
+  const nowIdx = now.getFullYear() * 12 + now.getMonth()
+  for (const acc of accounts.value.slice(0, 6)) {
+    try {
+      const page = await transactionService.getAccountTransaction(authStore.token, {
+        accountId: acc.accountId, pageNumber: 0, transactionsPerPage: 500, sorting: '', sortingOrder: false,
+      })
+      for (const t of page.content) {
+        const d = new Date(t.createdAt)
+        const monthsAgo = nowIdx - (d.getFullYear() * 12 + d.getMonth())
+        if (monthsAgo >= 0 && monthsAgo <= 11) buckets[11 - monthsAgo] += Number(t.amount)
+      }
+    } catch (e) {
+      // skip accounts we can't read so the chart still renders
+    }
+  }
+  volumes.value = buckets
+}
+
 onMounted(async () => {
   try {
     currentUser.value = await userService.getMe(authStore.token)
@@ -344,6 +368,7 @@ onMounted(async () => {
     } else {
       accounts.value = (await accountService.getAllAccounts(authStore.token)).content
     }
+    await loadChart()
   } catch (e) {
     error.value = e.message
   } finally {
