@@ -589,6 +589,53 @@ tbody tr:hover { background: var(--cream-soft); }
 .chart-months { display: flex; justify-content: space-between; margin-top: 12px; }
 .chart-months span { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; }
 
+/* View Account Page */
+.iban {
+  font-size: 24px; font-weight: 500; line-height: 1;
+  margin: 16px 0 14px; color: #F6F1E6;
+}
+
+.acc-status-holder {
+  color:rgba(241,234,220,0.72);
+  font-size: 26px;
+  font-weight: 600;
+
+  margin-top: 24px;
+
+}
+
+.acc-active {
+  color: #75ffa3;
+}
+
+.acc-closed {
+  color: #f74e4e;
+}
+
+.acc-tbl-text{
+  font-weight:600;
+}
+
+.acc-tbl-amount-plus{
+  font-weight:600;
+  background-color: #8bdc96;
+  border-radius: 2px;
+
+  width: min-content;
+}
+
+.acc-tbl-amount-min{
+  font-weight:600;
+  background-color: #d89999;
+  border-radius: 2px;
+
+  width: min-content;
+}
+
+.acc-tbl-date{
+  font-weight:600;
+}
+
 /* Responsive */
 @media (max-width: 1180px) {
   .app { grid-template-columns: 1fr; }

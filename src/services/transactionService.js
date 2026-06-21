@@ -1,8 +1,8 @@
 import { get, post } from '../utils/api.js';
 
 export const transactionService = {
-    async getAccountTransaction(token, getParam) {
-        const response = await post('/api/transactions/account', getParam, {
+    async getAccountTransaction(token, accountId, pageNumber, transactionsPerPage, sorting, sortingOrder) {
+        const response = await get(`/api/transactions?accountId=${accountId}&pageNumber=${pageNumber}&transactionsPerPage=${transactionsPerPage}&sorting=${sorting}&sortingOrder=${sortingOrder}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error('Failed to get accounts transactions');

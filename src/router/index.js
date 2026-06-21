@@ -1,14 +1,15 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { useAuthStore } from '../stores/authStore.js'
 
-import LoginPage     from '../components/pages/LoginPage/LoginPage.vue'
-import AtmLoginPage  from '../components/pages/AtmLoginPage/AtmLoginPage.vue'
-import AtmPage       from '../components/pages/AtmPage/AtmPage.vue'
-import RegisterPage  from '../components/pages/RegisterPage/RegisterPage.vue'
-import DashboardPage from '../components/pages/DashboardPage/DashBoardPage.vue'
-import AccountsPage  from '../components/pages/AccountsPage/AccountsPage.vue'
+import LoginPage       from '../components/pages/LoginPage/LoginPage.vue'
+import AtmLoginPage    from '../components/pages/AtmLoginPage/AtmLoginPage.vue'
+import AtmPage         from '../components/pages/AtmPage/AtmPage.vue'
+import RegisterPage    from '../components/pages/RegisterPage/RegisterPage.vue'
+import DashboardPage   from '../components/pages/DashboardPage/DashBoardPage.vue'
+import AccountsPage    from '../components/pages/AccountsPage/AccountsPage.vue'
 import ViewAccountPage from '../components/pages/ViewAccountPage/ViewAccountPage.vue'
 import TransferPage    from '../components/pages/TransferPage/TransferPage.vue'
+import TransactionPage from '../components/pages/TransactionPage/TransactionPage.vue'
 import UsersPage       from '../components/pages/UsersPage/UsersPage.vue'
 
 const routes = [
@@ -19,8 +20,9 @@ const routes = [
   { path: '/register',  component: RegisterPage,  meta: { public: true } },
   { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
   { path: '/accounts',  component: AccountsPage,  meta: { requiresAuth: true, employeeOnly: true } },
-  { path: '/account/:accountId', name: 'account',   component: ViewAccountPage,  meta: { requiresAuth: true, employeeOnly: false } },
-  { path: '/transfer',           name: 'transfer',  component: TransferPage,     meta: { requiresAuth: true, employeeOnly: false } },
+  { path: '/account/:accountId', name: 'account',     component: ViewAccountPage,  meta: { requiresAuth: true, employeeOnly: false } },
+  { path: '/transfer',           name: 'transfer',    component: TransferPage,     meta: { requiresAuth: true, employeeOnly: false } },
+  { path: '/transaction/:transactionId', name: 'transaction', component: TransactionPage,  meta: { requiresAuth: true, employeeOnly: false } },
   { path: '/users',     component: UsersPage,        meta: { requiresAuth: true, employeeOnly: true } },
 ]
 
