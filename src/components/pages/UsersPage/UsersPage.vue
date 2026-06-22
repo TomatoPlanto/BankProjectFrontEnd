@@ -14,6 +14,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>
           Overview
         </RouterLink>
+        <RouterLink to="/transfer" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h11"/><path d="M14 3l4 4-4 4"/><path d="M17 17H6"/><path d="M10 21l-4-4 4-4"/></svg>
+          Transfer
+        </RouterLink>
+        
         <div class="nav-label">Management</div>
         <RouterLink to="/accounts" class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
@@ -22,6 +27,10 @@
         <RouterLink to="/users" class="nav-item active">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
           Users
+        </RouterLink>
+        <RouterLink to="/transactions" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          Transactions
         </RouterLink>
       </nav>
       <div class="sidebar-foot">
@@ -49,6 +58,17 @@
           <div class="avatar">EM</div>
         </div>
       </header>
+
+      <div style="margin-bottom: 1rem; display: flex; gap: 0.75rem;">
+        <input
+          v-model="searchQuery"
+          class="input"
+          placeholder="Search by name..."
+          style="max-width: 300px;"
+          @input="handleSearch"
+        />
+        <button v-if="searchQuery" class="btn btn-ghost" @click="clearSearch">Clear</button>
+      </div>
 
       <div class="filter-tabs">
         <button v-for="tab in ['ALL','PENDING','ACTIVE','CLOSED']" :key="tab"
@@ -112,10 +132,24 @@ const router    = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const filter    = ref('ALL')
+const searchQuery = ref('')
 
 const filteredUsers = computed(() =>
   filter.value === 'ALL' ? userStore.users : userStore.users.filter(u => u.status === filter.value)
 )
+
+function handleSearch() {
+  if (searchQuery.value.trim().length < 2) {
+    userStore.fetchAllUsers()
+    return
+  }
+  userStore.searchByName(searchQuery.value.trim())
+}
+
+function clearSearch() {
+  searchQuery.value = ''
+  userStore.fetchAllUsers()
+}
 
 function fullName(user) { return [user.firstName, user.infix, user.lastName].filter(Boolean).join(' ') }
 function statusBadge(s) { return { ACTIVE:'badge badge-green', PENDING:'badge badge-gold', CLOSED:'badge badge-red' }[s] ?? 'badge' }

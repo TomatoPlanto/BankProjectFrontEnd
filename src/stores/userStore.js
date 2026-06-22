@@ -15,7 +15,21 @@ export const useUserStore = defineStore('user', {
             this.loading = true;
             this.error = '';
             try {
-                this.users = await userService.getAllUsers(authStore.token);
+                const page = await userService.getAllUsers(authStore.token);
+                this.users = page.content;
+            } catch (e) {
+                this.error = e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async searchByName(name) {
+            const authStore = useAuthStore();
+            this.loading = true;
+            this.error = '';
+            try {
+                this.users = await userService.searchByName(authStore.token, name);
             } catch (e) {
                 this.error = e.message;
             } finally {

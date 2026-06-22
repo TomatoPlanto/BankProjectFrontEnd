@@ -16,7 +16,8 @@ export const useAccountStore = defineStore('account', {
             this.loading = true;
             this.error = '';
             try {
-                this.accounts = await accountService.getAllAccounts(authStore.token);
+                const page = await accountService.getAllAccounts(authStore.token);
+                this.accounts = page.content;
             } catch (e) {
                 this.error = e.message;
             } finally {
@@ -42,7 +43,7 @@ export const useAccountStore = defineStore('account', {
             this.error = '';
             this.success = '';
             try {
-                await accountService.updateLimits(authStore.token, accountId, limits);
+                await accountService.updateAccount(authStore.token, accountId, limits);
                 this.success = 'Limits updated successfully';
                 await this.fetchAllAccounts();
             } catch (e) {
@@ -55,7 +56,7 @@ export const useAccountStore = defineStore('account', {
             this.error = '';
             this.success = '';
             try {
-                await accountService.closeAccount(authStore.token, accountId);
+                await accountService.updateAccount(authStore.token, accountId, { status: 'CLOSED' });
                 this.success = 'Account closed successfully';
                 await this.fetchAllAccounts();
             } catch (e) {

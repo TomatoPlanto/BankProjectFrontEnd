@@ -14,6 +14,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>
           Overview
         </RouterLink>
+        <RouterLink to="/transfer" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h11"/><path d="M14 3l4 4-4 4"/><path d="M17 17H6"/><path d="M10 21l-4-4 4-4"/></svg>
+          Transfer
+        </RouterLink>
+        
         <div class="nav-label">Management</div>
         <RouterLink to="/accounts" class="nav-item active">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
@@ -22,6 +27,10 @@
         <RouterLink to="/users" class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
           Users
+        </RouterLink>
+        <RouterLink to="/transactions" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          Transactions
         </RouterLink>
       </nav>
       <div class="sidebar-foot">
@@ -58,6 +67,7 @@
         <table>
           <thead>
             <tr>
+              <th>Customer</th>
               <th>IBAN</th>
               <th>Type</th>
               <th>Balance</th>
@@ -69,6 +79,7 @@
           </thead>
           <tbody>
             <tr v-for="account in accountStore.accounts" :key="account.accountId">
+              <td style="font-weight:600">{{ account.ownerName }}</td>
               <td style="font-family:monospace; font-size:12px">{{ account.iban }}</td>
               <td>
                 <span :class="account.accountType === 'CHECKING' ? 'badge badge-blue' : 'badge badge-purple'">
@@ -91,7 +102,7 @@
               </td>
             </tr>
             <tr v-if="!accountStore.accounts.length && !accountStore.loading">
-              <td colspan="7" class="empty-state">No accounts found</td>
+              <td colspan="8" class="empty-state">No accounts found</td>
             </tr>
           </tbody>
         </table>

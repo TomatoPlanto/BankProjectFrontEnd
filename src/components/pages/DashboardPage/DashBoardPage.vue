@@ -15,6 +15,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>
           Overview
         </RouterLink>
+        
+        <RouterLink to="/transfer" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h11"/><path d="M14 3l4 4-4 4"/><path d="M17 17H6"/><path d="M10 21l-4-4 4-4"/></svg>
+          Transfer
+        </RouterLink>
         <template v-if="authStore.isEmployee">
           <div class="nav-label">Management</div>
           <RouterLink to="/accounts" class="nav-item">
@@ -24,6 +29,10 @@
           <RouterLink to="/users" class="nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
             Users
+          </RouterLink>
+          <RouterLink to="/transactions" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+            Transactions
           </RouterLink>
         </template>
       </nav>
@@ -209,18 +218,19 @@
                     <span>Users</span>
                   </RouterLink>
                 </template>
+                
                 <div class="action">
                   <div class="action-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   </div>
                   <span>Statements</span>
                 </div>
-                <div class="action">
+                <RouterLink to="/transfer" class="action">
                   <div class="action-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                   <span>Transfer</span>
-                </div>
+                </RouterLink>       
               </div>
             </section>
 
@@ -256,6 +266,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/authStore.js'
 import { accountService } from '../../../services/accountService.js'
 import { userService } from '../../../services/userService.js'
+import { transactionService } from '../../../services/transactionService.js'
 
 const router      = useRouter()
 const authStore   = useAuthStore()
@@ -264,8 +275,8 @@ const currentUser = ref(null)
 const loading     = ref(true)
 const error       = ref('')
 
-// Realistic 12-month activity volumes for the graph
-const volumes = [210, 295, 500, 247, 414, 350, 520, 349, 260, 535, 175, 535]
+// monthly activity totals for the graph, filled from real transactions on load
+const volumes = ref(new Array(12).fill(0))
 
 const firstName = computed(() => {
   if (currentUser.value?.firstName) return currentUser.value.firstName
@@ -304,9 +315,10 @@ const totalWhole     = computed(() => Math.floor(totalBalance.value).toLocaleStr
 const totalCents     = computed(() => (totalBalance.value % 1).toFixed(2).slice(2))
 
 const chartPts = computed(() => {
-  const max = Math.max(...volumes), min = Math.min(...volumes), range = max - min || 1
-  return volumes.map((v, i) => ({
-    x: (i / (volumes.length - 1)) * 560,
+  const vals = volumes.value
+  const max = Math.max(...vals), min = Math.min(...vals), range = max - min || 1
+  return vals.map((v, i) => ({
+    x: (i / (vals.length - 1)) * 560,
     y: 10 + (1 - (v - min) / range) * 120,
   }))
 })
@@ -336,14 +348,36 @@ const monthLabels = computed(() => {
   return labels
 })
 
+// sum each account's transactions into 12 monthly buckets (oldest -> current month)
+async function loadChart() {
+  const buckets = new Array(12).fill(0)
+  const now = new Date()
+  const nowIdx = now.getFullYear() * 12 + now.getMonth()
+  
+  for (const acc of accounts.value.slice(0, 6)) {
+    try {
+      const page = await transactionService.getTransactions(authStore.token, acc.accountId, 0, 500, '', false, null)
+      for (const t of page.content) {
+        const d = new Date(t.createdAt)
+        const monthsAgo = nowIdx - (d.getFullYear() * 12 + d.getMonth())
+        if (monthsAgo >= 0 && monthsAgo <= 11) buckets[11 - monthsAgo] += Number(t.amount)
+      }
+    } catch (e) {
+      // skip accounts we can't read so the chart still renders
+    }
+  }
+  volumes.value = buckets
+}
+
 onMounted(async () => {
   try {
     currentUser.value = await userService.getMe(authStore.token)
     if (authStore.isCustomer) {
       accounts.value = await accountService.getAccountsByUserId(authStore.token, currentUser.value.userId)
     } else {
-      accounts.value = await accountService.getAllAccounts(authStore.token)
+      accounts.value = (await accountService.getAllAccounts(authStore.token)).content
     }
+    await loadChart()
   } catch (e) {
     error.value = e.message
   } finally {
