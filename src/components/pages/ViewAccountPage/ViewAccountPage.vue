@@ -140,7 +140,6 @@
 
                     <label for="order" class="label">Order</label>
                     <select id="order" name="order" v-model="order" class="input">
-                        <option value="createdAt" selected>Date</option>
                         <option value="false">Asending</option>
                         <option value="true">Desending</option>
                     </select>
