@@ -39,15 +39,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../../../stores/authStore.js'
+import { useAtmStore } from '../../../stores/atmStore.js'
 import { post } from '../../../utils/api.js'
 
 const router    = useRouter()
-const authStore = useAuthStore()
 const iban    = ref('')
 const pin     = ref('')
 const error   = ref('')
 const loading = ref(false)
+const atmStore = useAtmStore()
 
 async function handleAtmLogin() {
   error.value = ''
@@ -62,12 +62,7 @@ async function handleAtmLogin() {
       throw new Error(data.error || 'ATM login failed')
     }
     const data = await response.json()
-    authStore.token = data.token
-    authStore.role  = data.role
-    authStore.email = data.email
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('role',  data.role)
-    localStorage.setItem('email', data.email)
+    atmStore.login(data)
     router.push('/atm')
   } catch (e) {
     error.value = e.message || 'Invalid IBAN or PIN'
