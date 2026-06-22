@@ -53,8 +53,12 @@
             </div>
         </aside>
 
-        <div class="main">  
-            <div class="hero">
+        <div class="main">
+            <div v-if="error" class="alert alert-error">
+                Unexpected error has occured! Failed to load account. 
+            </div>
+
+            <div v-if="!loading && !error" class="hero">
                 <div class="hero-main">
                     <div>
                         <div class="eyebrow">Total Balance</div>
@@ -97,7 +101,18 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!loading" class="table-wrap">
+
+            <div v-if="!loading && transactionsPage.totalElements == 0" class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No tranactions found.</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div v-if="!loading && transactionsPage.totalElements > 0" class="table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -111,10 +126,10 @@
                         <tr v-for="trans in transactionsList" v-on:click="onTransactionClick(trans)">            
                             <td>
                                 <template v-if="getTransType(trans) == 'deposit'">
-                                        <span>--&gt;a</span>
+                                        <span>-&gt;a</span>
                                     </template>
                                     <template v-if="getTransType(trans) == 'withdraw'">
-                                        <span>a&lt;--</span>
+                                        <span>a&lt;-</span>
                                     </template>
                                     <template v-if="getTransType(trans) == 'transfer_get'">
                                         <span>--&gt;</span>
@@ -132,9 +147,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="acc-page-holder" v-if="!loading">
+
+            <div class="acc-page-holder" v-if="!loading && transactionsPage.totalPages != 1 && transactionsPage.totalElements > 0">
                 <div class="acc-page-holder-holder">
-                    <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(0)"><span>&lt;&lt;</span></div>
+                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(0)"><span>&lt;&lt;</span></div>
                     <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage - 1)"><span>&lt;</span></div>
 
                     <div v-for="i in (offEndPage - offStartPage + 1)" :class="(i + offStartPage - 1) == currentPage ? 'page-button-cur acc-page-button' : 'acc-page-button'" v-on:click="goToPage(i + offStartPage - 1)">
@@ -142,7 +158,7 @@
                     </div>
 
                     <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage + 1)"><span>&gt;</span></div>
-                    <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(transactionsPage.totalPages - 1)"><span>&gt;&gt;</span></div>
+                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(transactionsPage.totalPages - 1)"><span>&gt;&gt;</span></div>
                 </div>         
             </div>
         </div>
@@ -214,7 +230,7 @@
          return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", minimumFractionDigits: 2 }).format(amount);
     }
 
-    let error = ref('');
+    let error = ref(false);
     let loading = ref(true);
 
     const displayPagesLNR = 3;
@@ -241,12 +257,12 @@
             transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
 
             calcPaginationStaff();
+
+            loading.value = false;
         } 
         catch (e) {
             error.value = e.message;
-        }
-
-        loading.value = false;
+        }  
     }) 
 
     function getTransType(trans){
@@ -318,7 +334,7 @@
     }
 
     function onTransactionClick(trans){
-        this.router.push({ name: 'transaction', params: { transactionId: trans.transactionId } });
+        router.push({ name: 'transaction', params: { transactionId: trans.transactionId } });
     }
 
     function calcPaginationStaff(){
@@ -355,6 +371,11 @@
         calcPaginationStaff();
 
         loading.value = false;
+    }
+
+    function handleLogout() {
+        authStore.logout()
+        router.push('/login')
     }
 
     // (new Date(trans.createdAt)).toLocaleString("de-DE")
