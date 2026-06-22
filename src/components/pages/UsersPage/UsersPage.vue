@@ -28,6 +28,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
           Users
         </RouterLink>
+        <RouterLink to="/transactions" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          Transactions
+        </RouterLink>
       </nav>
       <div class="sidebar-foot">
         <div class="member">

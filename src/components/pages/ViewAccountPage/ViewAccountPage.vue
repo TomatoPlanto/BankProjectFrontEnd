@@ -34,6 +34,11 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
                         Users
                     </RouterLink>
+
+                    <RouterLink to="/transactions" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+                        Transactions
+                    </RouterLink>
                 </template>
             </nav>
 
@@ -102,6 +107,51 @@
                 </div>
             </div>
 
+            <div class="panel" v-if="!loading">
+                <div class="eyebrow">Filters</div>
+                
+                <div class="field">
+                    <label for="iban" class="label">Iban</label>
+                    <input id="iban" name="iban" type="text" v-model="filter.iban" class="input">
+                </div>
+
+                <div class="field">
+                    <label for="minAmount" class="label">Minimum Amount</label>
+                    <input id="minAmount" name="minAmount" type="number" step="0.01" min="0.01" max="1000000" v-model="filter.minAmount" class="input">
+                </div class="field">
+
+                <div class="field">
+                    <label for="maxAmount" class="label">Maximum Amount</label>
+                    <input id="maxAmount" name="maxAmount" type="number" step="0.01" min="0.01" max="1000000" v-model="filter.maxAmount" class="input">
+                </div>
+
+                <div class="field"> 
+                    <label for="equalAmount" class="label">Exact Amount</label>
+                    <input id="equalAmount" name="equalAmount" type="number" step="0.01" min="0.01" max="1000000" v-model="filter.equalAmount" class="input">               
+                </div>
+
+                <div class="field"> 
+                    <label for="sorting" class="label">Sorting</label>
+                    <select id="sorting" name="sorting" v-model="sorting" class="input">
+                        <option value="createdAt" selected>Date</option>
+                        <option value="amount">Amount</option>
+                        <option value="description">Description</option>
+                    </select>
+
+                    <label for="order" class="label">Order</label>
+                    <select id="order" name="order" v-model="order" class="input">
+                        <option value="createdAt" selected>Date</option>
+                        <option value="false">Asending</option>
+                        <option value="true">Desending</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: space-between;">
+                    <button v-on:click="onFilterClick()" class="btn btn-gold">Filter</button>
+                    <button v-on:click="clearFilter()" class="btn btn-gold">Clear Filter</button>
+                </div>             
+            </div>
+
             <div v-if="!loading && transactionsPage.totalElements == 0" class="table-wrap">
                 <table>
                     <thead>
@@ -150,15 +200,15 @@
 
             <div class="acc-page-holder" v-if="!loading && transactionsPage.totalPages != 1 && transactionsPage.totalElements > 0">
                 <div class="acc-page-holder-holder">
-                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(0)"><span>&lt;&lt;</span></div>
-                    <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage - 1)"><span>&lt;</span></div>
+                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(0, false)"><span>&lt;&lt;</span></div>
+                    <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage - 1, false)"><span>&lt;</span></div>
 
-                    <div v-for="i in (offEndPage - offStartPage + 1)" :class="(i + offStartPage - 1) == currentPage ? 'page-button-cur acc-page-button' : 'acc-page-button'" v-on:click="goToPage(i + offStartPage - 1)">
+                    <div v-for="i in (offEndPage - offStartPage + 1)" :class="(i + offStartPage - 1) == currentPage ? 'page-button-cur acc-page-button' : 'acc-page-button'" v-on:click="goToPage(i + offStartPage - 1, false)">
                         <span>{{ i + offStartPage}}</span>
                     </div>
 
-                    <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage + 1)"><span>&gt;</span></div>
-                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(transactionsPage.totalPages - 1)"><span>&gt;&gt;</span></div>
+                    <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage + 1, false)"><span>&gt;</span></div>
+                    <div v-if="transactionsPage.totalPages > 2" :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(transactionsPage.totalPages - 1, false)"><span>&gt;&gt;</span></div>
                 </div>         
             </div>
         </div>
@@ -241,6 +291,11 @@
     let offStartPage = ref(null);
     let offEndPage = ref(null);
 
+    let filter = {iban: null, minAmount: null, maxAmount: null, equalAmount: null };
+
+    let sorting = 'createdAt';
+    let order = false;
+
     let transactionsList = computed(() => {
         if (transactionsPage.value === null) return [];
         return transactionsPage.value.content;
@@ -254,7 +309,7 @@
       
             account.value = await accountService.getAccountById(authStore.token, accountId);
 
-            transactionsPage.value = await transactionService.getTransactions(authStore.token, accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
+            transactionsPage.value = await transactionService.getTransactions(authStore.token, accountId, currentPage.value, trasnsPerPage, sorting, order, filter);
 
             calcPaginationStaff();
 
@@ -359,18 +414,37 @@
         }  
     }
 
-    async function goToPage(page) {
-        if(page < 0 || page > transactionsPage.value.totalPages - 1 || currentPage.value == page) return;
+    async function goToPage(page, force) {
+        if(page < 0 || page > transactionsPage.value.totalPages - 1) return;
+
+        if(!force && currentPage.value == page) return;
 
         loading.value = true;
 
         currentPage.value = page;
 
-        transactionsPage.value = await transactionService.getTransactions(authStore.token, account.value.accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
+        try {
+            transactionsPage.value = await transactionService.getTransactions(authStore.token, account.value.accountId, currentPage.value, trasnsPerPage, sorting, order, filter);
 
-        calcPaginationStaff();
+            console.log(transactionsPage.value);
 
-        loading.value = false;
+            calcPaginationStaff();   
+
+            loading.value = false;
+        }
+        catch(e){
+            error = e;
+        }    
+    }
+
+    function onFilterClick(){
+        goToPage(0, true);
+    }
+
+    function clearFilter(){
+        filter = {iban: null, minAmount: null, maxAmount: null, equalAmount: null };
+
+        goToPage(0, true);
     }
 
     function handleLogout() {

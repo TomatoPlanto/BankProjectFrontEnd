@@ -353,9 +353,10 @@ async function loadChart() {
   const buckets = new Array(12).fill(0)
   const now = new Date()
   const nowIdx = now.getFullYear() * 12 + now.getMonth()
+  
   for (const acc of accounts.value.slice(0, 6)) {
     try {
-      const page = await transactionService.getAccountTransaction(authStore.token, acc.accountId, 0, 500, '', false)
+      const page = await transactionService.getTransactions(authStore.token, acc.accountId, 0, 500, '', false, null)
       for (const t of page.content) {
         const d = new Date(t.createdAt)
         const monthsAgo = nowIdx - (d.getFullYear() * 12 + d.getMonth())
