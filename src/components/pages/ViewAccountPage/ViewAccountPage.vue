@@ -254,7 +254,7 @@
       
             account.value = await accountService.getAccountById(authStore.token, accountId);
 
-            transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
+            transactionsPage.value = await transactionService.getTransactions(authStore.token, accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
 
             calcPaginationStaff();
 
@@ -366,7 +366,7 @@
 
         currentPage.value = page;
 
-        transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, account.value.accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
+        transactionsPage.value = await transactionService.getTransactions(authStore.token, account.value.accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
 
         calcPaginationStaff();
 
@@ -374,9 +374,7 @@
     }
 
     function handleLogout() {
-        authStore.logout()
-        router.push('/login')
+        authStore.logout();
+        router.push('/login');
     }
-
-    // (new Date(trans.createdAt)).toLocaleString("de-DE")
 </script>

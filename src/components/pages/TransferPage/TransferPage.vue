@@ -205,6 +205,7 @@ async function handleSubmit() {
   error.value = ''
   success.value = false
   loading.value = true
+  
   try {
     const fromAcc = await accountService.getAccountByIban(authStore.token, form.value.fromIban)
     const toAcc   = await accountService.getAccountByIban(authStore.token, form.value.toIban)
