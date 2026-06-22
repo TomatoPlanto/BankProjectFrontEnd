@@ -15,6 +15,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>
           Overview
         </RouterLink>
+        
+        <RouterLink to="/transfer" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h11"/><path d="M14 3l4 4-4 4"/><path d="M17 17H6"/><path d="M10 21l-4-4 4-4"/></svg>
+          Transfer
+        </RouterLink>
         <template v-if="authStore.isEmployee">
           <div class="nav-label">Management</div>
           <RouterLink to="/accounts" class="nav-item">
@@ -24,6 +29,10 @@
           <RouterLink to="/users" class="nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
             Users
+          </RouterLink>
+          <RouterLink to="/transactions" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+            Transactions
           </RouterLink>
         </template>
       </nav>
@@ -209,6 +218,7 @@
                     <span>Users</span>
                   </RouterLink>
                 </template>
+                
                 <div class="action">
                   <div class="action-ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -343,11 +353,10 @@ async function loadChart() {
   const buckets = new Array(12).fill(0)
   const now = new Date()
   const nowIdx = now.getFullYear() * 12 + now.getMonth()
+  
   for (const acc of accounts.value.slice(0, 6)) {
     try {
-      const page = await transactionService.getAccountTransaction(authStore.token, {
-        accountId: acc.accountId, pageNumber: 0, transactionsPerPage: 500, sorting: '', sortingOrder: false,
-      })
+      const page = await transactionService.getTransactions(authStore.token, acc.accountId, 0, 500, '', false, null)
       for (const t of page.content) {
         const d = new Date(t.createdAt)
         const monthsAgo = nowIdx - (d.getFullYear() * 12 + d.getMonth())
