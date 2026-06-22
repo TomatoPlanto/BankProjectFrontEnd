@@ -111,10 +111,10 @@
                         <tr v-for="trans in transactionsList" v-on:click="onTransactionClick(trans)">            
                             <td>
                                 <template v-if="getTransType(trans) == 'deposit'">
-                                        <span>--&gt;</span>
+                                        <span>--&gt;a</span>
                                     </template>
                                     <template v-if="getTransType(trans) == 'withdraw'">
-                                        <span>&lt;--</span>
+                                        <span>a&lt;--</span>
                                     </template>
                                     <template v-if="getTransType(trans) == 'transfer_get'">
                                         <span>--&gt;</span>
@@ -132,8 +132,18 @@
                     </tbody>
                 </table>
             </div>
-            <div>
-                
+            <div class="acc-page-holder" v-if="!loading">
+                <div class="acc-page-holder-holder">
+                    <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(0)"><span>&lt;&lt;</span></div>
+                    <div :class="currentPage == 0 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage - 1)"><span>&lt;</span></div>
+
+                    <div v-for="i in (offEndPage - offStartPage + 1)" :class="(i + offStartPage - 1) == currentPage ? 'page-button-cur acc-page-button' : 'acc-page-button'" v-on:click="goToPage(i + offStartPage - 1)">
+                        <span>{{ i + offStartPage}}</span>
+                    </div>
+
+                    <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(currentPage + 1)"><span>&gt;</span></div>
+                    <div :class="currentPage == transactionsPage.totalPages - 1 ? 'acc-page-button page-button-not-active' : 'acc-page-button page-button-nav'" v-on:click="goToPage(transactionsPage.totalPages - 1)"><span>&gt;&gt;</span></div>
+                </div>         
             </div>
         </div>
     </div>
@@ -207,8 +217,13 @@
     let error = ref('');
     let loading = ref(true);
 
+    const displayPagesLNR = 3;
+    const trasnsPerPage = 12;
+
     let transactionsPage = ref(null);
     let currentPage = ref(0);
+    let offStartPage = ref(null);
+    let offEndPage = ref(null);
 
     let transactionsList = computed(() => {
         if (transactionsPage.value === null) return [];
@@ -223,9 +238,9 @@
       
             account.value = await accountService.getAccountById(authStore.token, accountId);
 
-            transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, accountId, currentPage.value, 10, 'createdAt', false);
+            transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
 
-            //console.log(transactionsPage.value);
+            calcPaginationStaff();
         } 
         catch (e) {
             error.value = e.message;
@@ -304,6 +319,42 @@
 
     function onTransactionClick(trans){
         this.router.push({ name: 'transaction', params: { transactionId: trans.transactionId } });
+    }
+
+    function calcPaginationStaff(){
+        offStartPage.value = currentPage.value - displayPagesLNR;
+        offEndPage.value = currentPage.value + displayPagesLNR;
+
+        if(offStartPage.value < transactionsPage.value.totalPages - offEndPage.value){
+            if(offStartPage.value < 0){
+                offEndPage.value -= offStartPage.value;
+                offStartPage.value = 0;
+            }
+
+            if(offEndPage.value > transactionsPage.value.totalPages - 1) offEndPage.value = transactionsPage.value.totalPages - 1;
+        }
+        else{
+            if(offEndPage.value > transactionsPage.value.totalPages - 1){
+                offStartPage.value -= offEndPage.value - transactionsPage.value.totalPages + 1;
+                offEndPage.value = transactionsPage.value.totalPages - 1;
+            }
+
+            if(offStartPage.value < 0) offStartPage.value = 0;
+        }  
+    }
+
+    async function goToPage(page) {
+        if(page < 0 || page > transactionsPage.value.totalPages - 1 || currentPage.value == page) return;
+
+        loading.value = true;
+
+        currentPage.value = page;
+
+        transactionsPage.value = await transactionService.getAccountTransaction(authStore.token, account.value.accountId, currentPage.value, trasnsPerPage, 'createdAt', false);
+
+        calcPaginationStaff();
+
+        loading.value = false;
     }
 
     // (new Date(trans.createdAt)).toLocaleString("de-DE")
