@@ -18,7 +18,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h11"/><path d="M14 3l4 4-4 4"/><path d="M17 17H6"/><path d="M10 21l-4-4 4-4"/></svg>
           Transfer
         </RouterLink>
-        
+
         <div class="nav-label">Management</div>
         <RouterLink to="/accounts" class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
@@ -74,7 +74,7 @@
         <button v-for="tab in ['ALL','PENDING','ACTIVE','CLOSED']" :key="tab"
           class="btn" :class="filter === tab ? 'btn-gold' : 'btn-ghost'"
           style="padding:0.35rem 1rem; font-size:12px"
-          @click="filter = tab">
+          @click="changeFilter(tab)">
           {{ tab }}
         </button>
       </div>
@@ -95,7 +95,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in filteredUsers" :key="user.userId">
+            <tr v-for="user in userStore.users" :key="user.userId">
               <td style="font-weight:600">{{ fullName(user) }}</td>
               <td style="color:var(--ink-mute)">{{ user.email }}</td>
               <td>
@@ -112,18 +112,30 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="filteredUsers.length === 0 && !userStore.loading">
+            <tr v-if="userStore.users.length === 0 && !userStore.loading">
               <td colspan="6" class="empty-state">No users found</td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- pager: only for the paged list, not for search results -->
+      <div class="pager" v-if="!userStore.searching && userStore.totalPages > 1">
+        <button class="btn btn-ghost btn-sm" :disabled="userStore.page === 0"
+                @click="userStore.fetchAllUsers(userStore.page - 1)">‹ Prev</button>
+        <span class="pager-info">
+          Page {{ userStore.page + 1 }} of {{ userStore.totalPages }}
+          · {{ userStore.totalElements }} users
+        </span>
+        <button class="btn btn-ghost btn-sm" :disabled="userStore.page >= userStore.totalPages - 1"
+                @click="userStore.fetchAllUsers(userStore.page + 1)">Next ›</button>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/authStore.js'
 import { useUserStore } from '../../../stores/userStore.js'
@@ -134,21 +146,27 @@ const userStore = useUserStore()
 const filter    = ref('ALL')
 const searchQuery = ref('')
 
-const filteredUsers = computed(() =>
-  filter.value === 'ALL' ? userStore.users : userStore.users.filter(u => u.status === filter.value)
-)
+// status tabs now filter server-side (so paging stays correct across the whole dataset)
+function changeFilter(tab) {
+  filter.value = tab
+  searchQuery.value = ''
+  userStore.setStatus(tab)
+}
 
 function handleSearch() {
-  if (searchQuery.value.trim().length < 2) {
-    userStore.fetchAllUsers()
+  const q = searchQuery.value.trim()
+  if (q.length < 2) {
+    userStore.fetchAllUsers(0)
     return
   }
-  userStore.searchByName(searchQuery.value.trim())
+  userStore.searchByName(q)
 }
 
 function clearSearch() {
   searchQuery.value = ''
-  userStore.fetchAllUsers()
+  filter.value = 'ALL'
+  userStore.status = null
+  userStore.fetchAllUsers(0)
 }
 
 function fullName(user) { return [user.firstName, user.infix, user.lastName].filter(Boolean).join(' ') }
@@ -158,8 +176,27 @@ function formatDate(date) {
   return new Date(date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
 }
 
-onMounted(() => userStore.fetchAllUsers())
+onMounted(() => userStore.fetchAllUsers(0))
 function approve(id) { userStore.approveUser(id) }
 function close(id)   { userStore.closeUser(id) }
 function handleLogout() { authStore.logout(); router.push('/login') }
 </script>
+
+<style scoped>
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.pager-info {
+  font-size: 12px;
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+.pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+</style>

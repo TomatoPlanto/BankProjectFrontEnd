@@ -9,15 +9,19 @@ export const userService = {
     return response.json()
   },
 
-  // backend returns a page object, use .content for the array
-  async getAllUsers(token, page = 0, size = 20) {
-    const response = await get(`/api/users?page=${page}&size=${size}`, {
+  // backend returns a Spring Page object: { content, number, totalPages, totalElements, ... }
+  // status is optional — when set, the backend filters server-side (?status=ACTIVE etc.)
+  async getAllUsers(token, page = 0, size = 10, status = null) {
+    const params = new URLSearchParams({ page, size })
+    if (status) params.append('status', status)
+    const response = await get(`/api/users?${params.toString()}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     if (!response.ok) throw new Error('Failed to fetch users')
     return response.json()
   },
 
+  // search returns a plain List (not paged)
   async searchByName(token, name) {
     const response = await get(`/api/users/search?name=${encodeURIComponent(name)}`, {
       headers: { Authorization: `Bearer ${token}` },
