@@ -52,6 +52,18 @@ export async function del(endpoint, options = {}) {
   });
 }
 
+export async function patch(endpoint, data, options = {}) {
+  const url = buildApiUrl(endpoint);
+  return fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    body: JSON.stringify(data),
+  });
+}
+
 export function getApiUrl(endpoint) {
   return buildApiUrl(endpoint);
 }
